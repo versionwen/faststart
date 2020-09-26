@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wenxin.learn.faststart.web.mapper.OrderMapper">
+  <!--Author:version，Date:2020-08-28，selectbyId的结果映射配置，由mybatis-plus-generator-ui自动生成-->
+  <resultMap id="SelectbyIdResultDtoMap" type="com.wenxin.learn.faststart.web.dto.SelectbyIdResultDto"> 
+    <result column="id" property="id"/>
+    <result column="name" property="name"/>
+    <result column="count" property="count"/>
+    <result column="sale" property="sale"/>
+    <result column="version" property="version"/>
+    <result column="id" property="stockid"/>
+    <result column="sid" property="sid"/>
+    <result column="name" property="stockname"/>
+    <result column="order_id" property="orderId"/>
+    <result column="create_time" property="createTime"/> 
+  </resultMap>  
+  <!--Author:version，Date:2020-08-28,由mybatis-plus-generator-ui自动生成-->
+  <select id="selectbyId" resultMap="SelectbyIdResultDtoMap"> <![CDATA[
+            select * from stock left join stock_order on stock.id = stock_order.sid where stock.id=#{id};
+        ]]> </select>
+</mapper>

@@ -1,6 +1,7 @@
 package com.wenxin.learn.faststart.web.controller;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -20,6 +21,7 @@ import com.wenxin.learn.faststart.web.utils.RedisUtils;
  */
 @RestController
 @RequestMapping("/order")
+@Slf4j
 public class OrderAction {
 
 
@@ -44,7 +46,7 @@ public class OrderAction {
     public ResponseEntity<Order> getById(@PathVariable("id") String id) {
         String strJson = (String)redisUtils.get("orderId");
         if(strJson == null){
-            System.out.println("从DB中取值");
+            log.info("从DB中取值");
             Order order = orderService.getById(id);
             if(order != null){
                 redisUtils.set("orderId", JSON.toJSONString(order));
@@ -52,7 +54,7 @@ public class OrderAction {
             }
         }
         else {
-            System.out.println("从redis缓存中取值");
+            log.info("从redis缓存中取值");
             return new ResponseEntity<>(JSON.parseObject(strJson,Order.class),HttpStatus.OK);
         }
         return new ResponseEntity<>(orderService.getById(id), HttpStatus.OK);

@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class MallSecurityConfig extends SecurityConfig {
+public class FaststartSecurityConfig extends SecurityConfig {
 
     @Autowired
     private AdminService adminService;

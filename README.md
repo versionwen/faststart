@@ -1,6 +1,7 @@
 # faststart
-[![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)[![Build Status](https://travis-ci.org/xialonghua/kotmvp.svg?branch=master)](https://travis-ci.org/xialonghua/kotmvp) 
-正如题目所描述这样，这是快速搭建web的一个脚手架
+[![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0) &ensp; &ensp; [![Build Status](https://travis-ci.org/xialonghua/kotmvp.svg?branch=master)](https://travis-ci.org/xialonghua/kotmvp)   
+
+正如题目所描述这样，这是一款快速搭建web的一个脚手架
 
 ## 为什么要做这么一个东西
 其中自己平时会做一些小的项目，而权限管理是一个系统所必须的一部分，我也在网上看了很多项目脚手架，不是太过于臃肿，就是动不动就是分布式，高并发等，而我只是想做一个很基础的脚手架，我不想我自己做一些小项目就要安装一系列的软件，他要够简单，但是功能要够强大，同时要满足日后的扩展，所以我做出了这一款脚手架。

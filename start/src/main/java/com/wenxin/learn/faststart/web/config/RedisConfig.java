@@ -1,6 +1,7 @@
 package com.wenxin.learn.faststart.web.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -11,6 +12,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * @version 1.0
  * @date 2020/9/1 16:41
  */
+@Configuration
 public class RedisConfig {
     @Bean //redisTemplate注入到Spring容器
     public RedisTemplate<String,String> redisTemplate(RedisConnectionFactory factory){

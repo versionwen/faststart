@@ -19,7 +19,6 @@ public class RedisUtils {
     @Autowired
     private RedisTemplate redisTemplate;
     private static double size = Math.pow(2, 32);
-
     /**
      * 写入缓存
      *

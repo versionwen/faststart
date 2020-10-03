@@ -17,11 +17,6 @@
     </properties>
 
     <modules>
-        <module>faststart-api</module>
-        <module>faststart-dao</module>
-        <module>faststart-manager</module>
-        <module>faststart-service</module>
-        <module>faststart-web</module>
         <module>start</module>
     </modules>
 

@@ -3,6 +3,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 /**
  * <p>
@@ -13,15 +16,16 @@ import java.io.Serializable;
  * @since 2020-09-26
  */
 @TableName("admin")
+@Validated
 public class Admin implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-
+    @NotNull
     private String username;
-
+    @NotNull
     private String password;
 
     /**
@@ -32,6 +36,7 @@ public class Admin implements Serializable {
     /**
      * 邮箱
      */
+    @NotNull
     private String email;
 
     /**

@@ -18,11 +18,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 /**
- * mall-security模块相关配置
- * Created by macro on 2019/11/9.
- */
+* @Description: spring security 安全模块
+* @Author: version
+* @Date: 2020/9/29
+*/
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)

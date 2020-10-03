@@ -1,12 +1,12 @@
 # faststart
 [![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0) &ensp; &ensp; [![Build Status](https://travis-ci.org/xialonghua/kotmvp.svg?branch=master)](https://travis-ci.org/xialonghua/kotmvp)   
 
-正如题目所描述这样，这是一款快速搭建web的一个脚手架
+正如题目所描述这样，这是一款快速搭建web的一个脚手架，在线访问地址：www.faststart.wenxinblog.cn
 
 ## 为什么要做这么一个东西
 其中自己平时会做一些小的项目，而权限管理是一个系统所必须的一部分，我也在网上看了很多项目脚手架，不是太过于臃肿，就是动不动就是分布式，高并发等，而我只是想做一个很基础的脚手架，我不想我自己做一些小项目就要安装一系列的软件，他要够简单，但是功能要够强大，同时要满足日后的扩展，所以我做出了这一款脚手架。
 ## 这个项目使用了哪些技术
-这款脚手架化繁为简，使用了Springboot和和mysql同时写完了Redis（可扩展），rocketmq(可扩展)，对于权限部分，采用了spring security来进行基于菜单的动态权限控制，同时使用JWT来进行授权操作，一旦用户进行登录，后续每个请求都将包含JWT，此外，为了加快CURD的开发，引进了mybatis-plus进行curd的简化开发，同时引进mybatis-plus-ui直接进行傻瓜试代码生成。相关技术选型如下表所示
+这款脚手架化繁为简，使用了Springboot和和mysql同时写完了Redis，rocketmq(可扩展)，对于权限部分，采用了spring security来进行基于菜单的动态权限控制，同时使用JWT来进行授权操作，一旦用户进行登录，后续每个请求都将包含JWT，此外，为了加快CURD的开发，引进了mybatis-plus进行curd的简化开发，同时引进mybatis-plus-ui直接进行傻瓜试代码生成。相关技术选型如下表所示
 | 技术|版本|说明|
 |---|---|---|
 |springBoot|2.3.0|容器与基本的MVC框架|

@@ -60,5 +60,5 @@ String getCaptcha(String request);
 * @Author:  version
 * @Date: 2020/10/3
 */
-boolean verifyCaptcha(String captcha,String ipAddr);
+boolean verifyCaptcha(String captcha,String uuid);
 }

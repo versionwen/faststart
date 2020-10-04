@@ -90,25 +90,18 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
 
     @Override
     public String getCaptcha(String request) {
-        String ipAddr = request;
-       //对本地ip进行替换
-        if ("0:0:0:0:0:0:0:1".equals(ipAddr)){
-            ipAddr = "127.0.0.1";
-        }
-        log.info("获取到的ip地址为:{}",ipAddr);
+        String uuid = request;
+        log.info("获取到的UUID为:{}",uuid);
         ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(200, 100, 4, 4);
         String result = "data:image/png;base64,"+captcha.getImageBase64();
         log.info("captcha={}",captcha.getCode());
-        redisUtils.set(ipAddr,captcha.getCode(),60L);
+        redisUtils.set(uuid,captcha.getCode(),60L);
         return result;
     }
 
     @Override
-    public boolean verifyCaptcha(String captcha,String ipAddr) {
-        if ("0:0:0:0:0:0:0:1".equals(ipAddr)){
-            ipAddr = "127.0.0.1";
-        }
-        String rightCaptcha =(String)redisUtils.get(ipAddr);
+    public boolean verifyCaptcha(String captcha,String uuid) {
+        String rightCaptcha =(String)redisUtils.get(uuid);
         log.info("rightCaptcha={}",rightCaptcha);
         if(rightCaptcha == null||captcha == null){
             return false;

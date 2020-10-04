@@ -1,30 +1,22 @@
 package com.wenxin.learn.faststart.web.controller;
 
-import cn.hutool.captcha.CaptchaUtil;
-import cn.hutool.captcha.ShearCaptcha;
-import cn.hutool.captcha.generator.MathGenerator;
-import com.wenxin.learn.faststart.web.api.CommonResult;
-import com.wenxin.learn.faststart.web.config.RedisConfig;
+import cn.hutool.core.util.IdUtil;
+import com.wenxin.learn.faststart.web.api.CommonResult;;
 import com.wenxin.learn.faststart.web.entity.admin.AdminPO;
 import com.wenxin.learn.faststart.web.entity.user.LoginUser;
-import com.wenxin.learn.faststart.web.utils.IpUtil;
-import com.wenxin.learn.faststart.web.utils.RedisUtils;
+import com.wenxin.learn.faststart.web.rabbitmq.RabbitMQSent;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import com.wenxin.learn.faststart.web.service.AdminService;
 import com.wenxin.learn.faststart.web.entity.Admin;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,11 +49,15 @@ public class AdminAction {
     */
     @ApiOperation(value = "获取验证码")
     @GetMapping(value = "/getCaptcha")
-    public CommonResult getCaptcha(HttpServletRequest request){
-        String ipAddr = IpUtil.getIpAddr(request);
-        String captcha = adminService.getCaptcha(ipAddr);
+    public CommonResult getCaptcha(){
+        //生成请求者需要的UUID
+        String uuid = IdUtil.randomUUID();
+        String captcha = adminService.getCaptcha(uuid);
+        HashMap<String,String>captchaMap = new HashMap<>();
         if (captcha != null) {
-            return CommonResult.success(captcha);
+            captchaMap.put(uuid,captcha);
+            RabbitMQSent rabbitMQSent =new RabbitMQSent();
+            return CommonResult.success(captchaMap);
         }
         else {
             return CommonResult.failed("验证码生成失败");
@@ -69,9 +65,8 @@ public class AdminAction {
     }
     @GetMapping("/verifyCaptcha")
     @ApiOperation(value = "验证验证码是否正确")
-    public CommonResult verifyCaptcha(HttpServletRequest request,@RequestParam("captcha") String captcha){
-        String ipAddr = IpUtil.getIpAddr(request);
-        boolean verifyCaptcha = adminService.verifyCaptcha(captcha, ipAddr);
+    public CommonResult verifyCaptcha(@RequestParam("uuid") String uuid,@RequestParam("captcha") String captcha){
+        boolean verifyCaptcha = adminService.verifyCaptcha(captcha, uuid);
         if(verifyCaptcha == true){
             return CommonResult.success(true);
         }

@@ -9,6 +9,12 @@ spring:
     host: 127.0.0.1
     port: 6379
     password:
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username:
+    password:
+    virtual-host: faststart
 #mybatis:
 #  mapper-locations: classpath:mapper/*.xml
 mybatis-plus:

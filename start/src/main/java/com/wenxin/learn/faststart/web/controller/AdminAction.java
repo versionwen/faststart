@@ -1,13 +1,17 @@
 package com.wenxin.learn.faststart.web.controller;
 
 import cn.hutool.core.util.IdUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.wenxin.learn.faststart.web.api.CommonResult;;
 import com.wenxin.learn.faststart.web.entity.admin.AdminPO;
 import com.wenxin.learn.faststart.web.entity.user.LoginUser;
-import com.wenxin.learn.faststart.web.rabbitmq.RabbitMQSent;
+import com.wenxin.learn.faststart.web.utils.RedisUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +37,8 @@ import java.util.Map;
 @Slf4j
 @Api(tags = "AdminController",value = "后台用户管理")
 public class AdminAction {
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Autowired
     private AdminService adminService;
@@ -40,6 +46,8 @@ public class AdminAction {
     private String tokenHead;
     @Value("${jwt.tokenHeader}")
     private String tokenHeader;
+    @Autowired
+    RabbitTemplate rabbitTemplate;
     /**
     * @Description: 生成验证码
     * @Param:  request 用户的请求头
@@ -56,7 +64,6 @@ public class AdminAction {
         HashMap<String,String>captchaMap = new HashMap<>();
         if (captcha != null) {
             captchaMap.put(uuid,captcha);
-            RabbitMQSent rabbitMQSent =new RabbitMQSent();
             return CommonResult.success(captchaMap);
         }
         else {
@@ -72,6 +79,45 @@ public class AdminAction {
         }
         else {
             return CommonResult.failed("验证码错误");
+        }
+    }
+    @GetMapping("/sentVerifyEmail")
+    @ApiOperation(value = "验证管理员用户邮箱")
+    public CommonResult sentVerifyEmail(@RequestParam("email") String email){
+        Map<String,Object> map = new HashMap<>();
+        int code = (int)((Math.random()*9+1)*100000);
+        map.put("email",email);
+        map.put("code",code);
+        try {
+            String message = JSON.toJSONString(map);
+            rabbitTemplate.convertAndSend("topicExchange", "topic.mail",message);
+            String uuid = IdUtil.randomUUID();
+            redisUtils.set(uuid+":"+email,String.valueOf(code),15*60L);
+            return CommonResult.success(uuid);
+        }catch (Exception e){
+            log.error("验证管理员邮箱出现错误，错误详细为：{}",e);
+            return CommonResult.failed("发送邮件失败");
+        }
+
+
+    }
+    @PostMapping("/verifyemail")
+    public CommonResult verifyemail(@RequestBody Map<Object,Object>map){
+        String email = String.valueOf(map.get("email"));
+        String uuid = String.valueOf(map.get("uuid"));
+        String code = String.valueOf(map.get("code"));
+        log.info("email={},code={},uuid={}",email,code,uuid);
+        if(code == null||"".equals(code)){
+            return CommonResult.failed("验证码为空，验证失败");
+        }
+        String key = uuid+":"+email;
+        String rightCode = String.valueOf(redisUtils.get(key));
+        log.info("rightcode={}",rightCode);
+        if(rightCode.equals(code)){
+            return CommonResult.success(true);
+        }
+        else {
+            return CommonResult.failed("邮箱验证失败");
         }
     }
     @GetMapping(value = "/")

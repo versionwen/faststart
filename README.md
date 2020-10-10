@@ -55,7 +55,9 @@
 
 ##  项目运行
 
-安装好环境以后，直接启动FaststartApplication
+安装好环境以后，导入mysql脚本，在resource目录下有一个mail.seting,在这里面配置邮箱和密码
+在application-dev.yml中请配置好rabbitmq的地址，用户名，密码，同时请配置好数据库的用户名与密码，在配置好这些以后
+直接启动FaststartApplication
 
 ## CURD开发流程
 

@@ -2,13 +2,11 @@ package com.wenxin.learn.faststart.web.controller;
 
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.wenxin.learn.faststart.web.api.CommonResult;;
 import com.wenxin.learn.faststart.web.entity.admin.AdminPO;
 import com.wenxin.learn.faststart.web.entity.user.LoginUser;
 import com.wenxin.learn.faststart.web.utils.RedisUtils;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -21,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import com.wenxin.learn.faststart.web.service.AdminService;
 import com.wenxin.learn.faststart.web.entity.Admin;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,7 +74,7 @@ public class AdminAction {
     @ApiOperation(value = "验证验证码是否正确")
     public CommonResult verifyCaptcha(@RequestParam("uuid") String uuid,@RequestParam("captcha") String captcha){
         boolean verifyCaptcha = adminService.verifyCaptcha(captcha, uuid);
-        if(verifyCaptcha == true){
+        if(verifyCaptcha ){
             return CommonResult.success(true);
         }
         else {
@@ -95,13 +95,14 @@ public class AdminAction {
             redisUtils.set(uuid+":"+email,String.valueOf(code),15*60L);
             return CommonResult.success(uuid);
         }catch (Exception e){
-            log.error("验证管理员邮箱出现错误，错误详细为：{}",e);
+            log.error("验证管理员邮箱出现错误，错误详细为:",e);
             return CommonResult.failed("发送邮件失败");
         }
 
 
     }
     @PostMapping("/verifyemail")
+    @ApiOperation(value = "验证管理员邮箱")
     public CommonResult verifyemail(@RequestBody Map<Object,Object>map){
         String email = String.valueOf(map.get("email"));
         String uuid = String.valueOf(map.get("uuid"));
@@ -165,6 +166,7 @@ public class AdminAction {
             Map<String,String>tokenMap = new HashMap<>();
             tokenMap.put("token",token);
             tokenMap.put("tokenHead",tokenHead);
+            adminService.insertLoginLog(userName);
             return CommonResult.success(tokenMap);
         }
         else {
@@ -185,11 +187,34 @@ public class AdminAction {
           String password = admin.getPassword();
           String Email = admin.getEmail();
           Boolean registerResult = adminService.Register(username,password,Email);
-          if(registerResult == true){
+          if(registerResult){
               return CommonResult.success(admin);
           }
           else {
               return CommonResult.failed();
           }
+    }
+    @ApiOperation("修改指定用户信息")
+    @PostMapping("/update/{id}")
+    public CommonResult update(@PathVariable Long id,@RequestBody Admin admin){
+        boolean success = adminService.update(id, admin);
+        if(success){
+            return CommonResult.success("修改成功");
+        }
+        return CommonResult.failed("修改个人信息出错");
+    }
+    @ApiOperation(value = "刷新用户token")
+    @PostMapping(value = "/refreshtoken")
+    public CommonResult refreshToken(HttpServletRequest request){
+        String token = request.getHeader(tokenHeader);
+        log.info("获取到的token为：{}",token);
+        String refreshToken = adminService.refreshToken(token);
+        if(refreshToken == null){
+            return CommonResult.failed("token已失效");
+        }
+        Map<String,String>tokenResult = new HashMap<>();
+        tokenResult.put("token",refreshToken);
+        tokenResult.put("tokenHead",tokenHead);
+        return CommonResult.success(tokenResult);
     }
 }

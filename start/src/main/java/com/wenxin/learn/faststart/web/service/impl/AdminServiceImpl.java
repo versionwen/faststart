@@ -3,12 +3,15 @@ package com.wenxin.learn.faststart.web.service.impl;
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.ShearCaptcha;
 import cn.hutool.captcha.generator.MathGenerator;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wenxin.learn.faststart.web.domain.AdminUserDetails;
 import com.wenxin.learn.faststart.web.entity.Admin;
+import com.wenxin.learn.faststart.web.entity.LoginLog;
 import com.wenxin.learn.faststart.web.entity.UmsResource;
 import com.wenxin.learn.faststart.web.mapper.AdminMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wenxin.learn.faststart.web.mapper.LoginLogMapper;
 import com.wenxin.learn.faststart.web.mapper.UmsResourceMapper;
 import com.wenxin.learn.faststart.web.service.AdminService;
 import com.wenxin.learn.faststart.web.utils.IpUtil;
@@ -20,6 +23,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.crypto.Data;
@@ -49,6 +54,8 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     private UmsResourceMapper resourceMapper;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private LoginLogMapper loginLogMapper;
     @Override
     public UserDetails loadUserByUsername(String username){
         QueryWrapper<Admin> wrapper = new QueryWrapper<>();
@@ -112,6 +119,52 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         else {
             return false;
         }
+    }
+
+    @Override
+    public String refreshToken(String oldToken) {
+
+        return jwtTokenUtil.refreshHeadToken(oldToken);
+
+    }
+
+    @Override
+    public void insertLoginLog(String username) {
+        QueryWrapper<Admin>wrapper = new QueryWrapper<>();
+        QueryWrapper<Admin> user = wrapper.eq("username", username);
+        Admin userLog = adminMapper.selectOne(user);
+        if(user == null){
+            return;
+        }
+        LoginLog loginLog = new LoginLog();
+        loginLog.setAdminId(userLog.getId());
+        loginLog.setCreateTime(new Date());
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+        String ua = request.getHeader("User-Agent");
+        loginLog.setUserAgent(ua);
+        loginLog.setIp(request.getRemoteAddr());
+        loginLogMapper.insert(loginLog);
+    }
+
+    @Override
+    public boolean update(Long id, Admin admin) {
+        admin.setId(id);
+        Admin rawAdmin = getById(id);
+        if(rawAdmin.getPassword().equals(admin.getPassword())){
+            //密码相同，不用修改
+            admin.setPassword(null);
+        }
+        else {
+            if(StrUtil.isEmpty(admin.getPassword())){
+                admin.setPassword(null);
+            }
+            else {
+                admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+            }
+        }
+        boolean success = updateById(admin);
+        return success;
     }
 
 

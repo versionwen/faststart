@@ -131,7 +131,7 @@ public class JwtTokenUtil {
         if(StrUtil.isEmpty(oldToken)){
             return null;
         }
-        String token = oldToken.substring(tokenHead.length());
+        String token = oldToken;
         if(StrUtil.isEmpty(token)){
             return null;
         }

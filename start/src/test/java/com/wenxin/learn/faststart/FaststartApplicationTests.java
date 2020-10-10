@@ -50,8 +50,11 @@ class FaststartApplicationTests {
     }
     @Test
     void mailTest(){
-//        MailUtil.send("1218156401@qq.com", "测试", "邮件来自faststart测试", false);
-//        Map<String,Object>map =new HashMap<>();
+//        Long startTime = System.currentTimeMillis();
+//       MailUtil.send("1218156401@qq.com", "测试", "邮件来自faststart测试", false);
+//       Long endTime = System.currentTimeMillis();
+//       log.info("发送邮件时间为：{}{}",endTime-startTime,"ms");
+       //        Map<String,Object>map =new HashMap<>();
 //        map.put("wen","xin");
 //        map.put("uuid","12234345");
 ////        JSONObject jsonObject = new JSONObject(map);

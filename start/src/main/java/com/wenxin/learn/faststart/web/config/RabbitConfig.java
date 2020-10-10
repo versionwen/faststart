@@ -1,10 +1,8 @@
 package com.wenxin.learn.faststart.web.config;
 
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,18 +12,19 @@ import org.springframework.context.annotation.Configuration;
  * @date 2020/10/4 11:43
  */
 @Configuration
+@Slf4j
 public class RabbitConfig {
     //绑定键
     public final static String mail = "topic.mail";
     public final static String sms = "topic.sms";
 
     @Bean
-    public Queue firstQueue() {
+    public Queue mailQueue() {
         return new Queue(RabbitConfig.mail);
     }
 
     @Bean
-    public Queue secondQueue() {
+    public Queue smsQueue() {
         return new Queue(RabbitConfig.sms);
     }
 
@@ -35,17 +34,17 @@ public class RabbitConfig {
     }
 
 
-    //将firstQueue和topicExchange绑定,而且绑定的键值为topic.mail
+    //将mailQueue和topicExchange绑定,而且绑定的键值为topic.mail
     //这样只要是消息携带的路由键是topic.mail,才会分发到该队列
     @Bean
-    Binding bindingExchangeMessage() {
-        return BindingBuilder.bind(firstQueue()).to(exchange()).with(mail);
+    Binding bindingExchangeMessagemail() {
+        return BindingBuilder.bind(mailQueue()).to(exchange()).with(mail);
     }
 
-    //将secondQueue和topicExchange绑定,
+    //将smsQueue和topicExchange绑定,
     @Bean
-    Binding bindingExchangeMessage2() {
-        return BindingBuilder.bind(secondQueue()).to(exchange()).with("topic.sms");
+    Binding bindingExchangeMessagesms() {
+        return BindingBuilder.bind(smsQueue()).to(exchange()).with(sms);
     }
 
 }

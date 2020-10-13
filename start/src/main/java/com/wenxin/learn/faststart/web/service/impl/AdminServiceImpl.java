@@ -98,12 +98,14 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Override
     public String getCaptcha(String request) {
         String uuid = request;
-        log.info("获取到的UUID为:{}",uuid);
         ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(200, 100, 4, 4);
-        String result = "data:image/png;base64,"+captcha.getImageBase64();
-        log.info("captcha={}",captcha.getCode());
-        redisUtils.set(uuid,captcha.getCode(),60L);
+        log.info("获取到的UUID为:{}",uuid);
+        captcha.setGenerator(new MathGenerator());
+        String result = "data:image/png;base64," + captcha.getImageBase64();
+        log.info("captcha={}", captcha.getCode());
+        redisUtils.set(uuid, captcha.getCode(), 60L);
         return result;
+
     }
 
     @Override

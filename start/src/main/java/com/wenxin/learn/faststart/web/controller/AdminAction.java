@@ -108,7 +108,7 @@ public class AdminAction {
         String uuid = String.valueOf(map.get("uuid"));
         String code = String.valueOf(map.get("code"));
         log.info("email={},code={},uuid={}",email,code,uuid);
-        if(code == null||"".equals(code)){
+        if(code == null||"".equals(code) || "null".equals(code)){
             return CommonResult.failed("验证码为空，验证失败");
         }
         String key = uuid+":"+email;

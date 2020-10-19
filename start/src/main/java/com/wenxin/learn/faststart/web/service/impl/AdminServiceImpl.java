@@ -100,10 +100,10 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         String uuid = request;
         ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(200, 100, 4, 4);
         log.info("获取到的UUID为:{}",uuid);
-        captcha.setGenerator(new MathGenerator());
+//        captcha.setGenerator(new MathGenerator());
         String result = "data:image/png;base64," + captcha.getImageBase64();
-        log.info("captcha={}", captcha.getCode());
-        redisUtils.set(uuid, captcha.getCode(), 60L);
+        log.info("captcha={}", captcha.getCode().toUpperCase());
+        redisUtils.set(uuid, captcha.getCode().toUpperCase(), 60L);
         return result;
 
     }
@@ -115,7 +115,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         if(rightCaptcha == null||captcha == null){
             return false;
         }
-        if(captcha.equals(rightCaptcha)){
+        if(captcha.toUpperCase().equals(rightCaptcha)){
             return true ;
         }
         else {

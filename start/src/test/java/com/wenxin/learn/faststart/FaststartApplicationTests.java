@@ -12,6 +12,7 @@ import com.wenxin.learn.faststart.web.mapper.OrderMapper;
 //import com.wenxin.learn.faststart.web.mq.Producer;
 import com.wenxin.learn.faststart.web.rabbitmq.RabbitMQSent;
 import com.wenxin.learn.faststart.web.service.AdminService;
+import com.wenxin.learn.faststart.web.service.MenuService;
 import com.wenxin.learn.faststart.web.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 //import org.apache.rocketmq.client.exception.MQBrokerException;
@@ -40,6 +41,8 @@ class FaststartApplicationTests {
     AdminService adminService;
     @Autowired
     RabbitTemplate rabbitTemplate;
+    @Autowired
+    MenuService menuService;
     private List<String> mesList;
     @Test
     void contextLoads() {
@@ -50,6 +53,7 @@ class FaststartApplicationTests {
     }
     @Test
     void mailTest(){
+        log.info("menuList信息为：{}",menuService.list(1L,5,1));
 //        Long startTime = System.currentTimeMillis();
 //       MailUtil.send("1218156401@qq.com", "测试", "邮件来自faststart测试", false);
 //       Long endTime = System.currentTimeMillis();

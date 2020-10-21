@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class FaststartApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(FaststartApplication.class, args);
     }
 

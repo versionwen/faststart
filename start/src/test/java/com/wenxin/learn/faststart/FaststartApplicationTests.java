@@ -53,7 +53,7 @@ class FaststartApplicationTests {
     }
     @Test
     void mailTest(){
-        log.info("menuList信息为：{}",menuService.list(1L,5,1));
+//        log.info("menuList信息为：{}",menuService.list(1L,5,1));
 //        Long startTime = System.currentTimeMillis();
 //       MailUtil.send("1218156401@qq.com", "测试", "邮件来自faststart测试", false);
 //       Long endTime = System.currentTimeMillis();

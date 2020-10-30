@@ -1,10 +1,16 @@
 package com.wenxin.learn.faststart.web.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wenxin.learn.faststart.web.dto.UpdateAdminPasswordParam;
 import com.wenxin.learn.faststart.web.entity.Admin;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.wenxin.learn.faststart.web.entity.Role;
+import com.wenxin.learn.faststart.web.entity.UmsResource;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * <p>
@@ -91,4 +97,38 @@ public interface AdminService extends IService<Admin> {
   */
   boolean update(Long id,Admin admin);
 
+ /**
+  * 根据用户名或昵称分页查询用户
+  */
+ Page<Admin> list(String keyword, Integer pageSize, Integer pageNum);
+
+ /**
+  * 删除指定用户
+  */
+ boolean delete(Long id);
+
+ /**
+  * 修改用户角色关系
+  */
+ @Transactional
+ int updateRole(Long adminId, List<Long> roleIds);
+
+ /**
+  * 获取用户对于角色
+  */
+ List<Role> getRoleList(Long adminId);
+
+ /**
+  * 获取指定用户的可访问资源
+  */
+ List<UmsResource> getResourceList(Long adminId);
+
+ /**
+  * 修改密码
+  */
+ int updatePassword(UpdateAdminPasswordParam updatePasswordParam);
+ /**
+  * 根据用户名获取后台管理员
+  */
+ Admin getAdminByUsername(String username);
 }

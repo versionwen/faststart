@@ -3,16 +3,19 @@ package com.wenxin.learn.faststart.web.service.impl;
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.ShearCaptcha;
 import cn.hutool.captcha.generator.MathGenerator;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wenxin.learn.faststart.web.domain.AdminUserDetails;
-import com.wenxin.learn.faststart.web.entity.Admin;
-import com.wenxin.learn.faststart.web.entity.LoginLog;
-import com.wenxin.learn.faststart.web.entity.UmsResource;
+import com.wenxin.learn.faststart.web.dto.UpdateAdminPasswordParam;
+import com.wenxin.learn.faststart.web.entity.*;
 import com.wenxin.learn.faststart.web.mapper.AdminMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wenxin.learn.faststart.web.mapper.LoginLogMapper;
+import com.wenxin.learn.faststart.web.mapper.RoleMapper;
 import com.wenxin.learn.faststart.web.mapper.UmsResourceMapper;
+import com.wenxin.learn.faststart.web.service.AdminRoleRelationService;
 import com.wenxin.learn.faststart.web.service.AdminService;
 import com.wenxin.learn.faststart.web.utils.IpUtil;
 import com.wenxin.learn.faststart.web.utils.JwtTokenUtil;
@@ -23,6 +26,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -56,6 +60,10 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     private RedisUtils redisUtils;
     @Autowired
     private LoginLogMapper loginLogMapper;
+    @Autowired
+    private RoleMapper roleMapper;
+    @Autowired
+    private AdminRoleRelationService adminRoleRelationService;
     @Override
     public UserDetails loadUserByUsername(String username){
         QueryWrapper<Admin> wrapper = new QueryWrapper<>();
@@ -167,6 +175,84 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         }
         boolean success = updateById(admin);
         return success;
+    }
+
+    @Override
+    public Page<Admin> list(String keyword, Integer pageSize, Integer pageNum) {
+        return null;
+    }
+
+    @Override
+    public boolean delete(Long id) {
+        return false;
+    }
+
+    @Override
+    public int updateRole(Long adminId, List<Long> roleIds) {
+        int count = roleIds == null ? 0 : roleIds.size();
+        //先删除原来的关系
+        QueryWrapper<AdminRoleRelation> wrapper = new QueryWrapper<>();
+        wrapper.lambda().eq(AdminRoleRelation::getAdminId,adminId);
+        adminRoleRelationService.remove(wrapper);
+        //建立新关系
+        if (!CollectionUtils.isEmpty(roleIds)) {
+            List<AdminRoleRelation> list = new ArrayList<>();
+            for (Long roleId : roleIds) {
+                AdminRoleRelation roleRelation = new AdminRoleRelation();
+                roleRelation.setAdminId(adminId);
+                roleRelation.setRoleId(roleId);
+                list.add(roleRelation);
+            }
+            adminRoleRelationService.saveBatch(list);
+        }
+        return count;
+    }
+
+    @Override
+    public List<Role> getRoleList(Long adminId) {
+        return roleMapper.getRoleList(adminId);
+    }
+
+    @Override
+    public List<UmsResource> getResourceList(Long adminId) {
+        List<UmsResource> resourceList;
+        resourceList = resourceMapper.getResourceList(adminId);
+        return resourceList;
+    }
+
+    @Override
+    public int updatePassword(UpdateAdminPasswordParam param) {
+        if(StrUtil.isEmpty(param.getUsername())
+                ||StrUtil.isEmpty(param.getOldPassword())
+                ||StrUtil.isEmpty(param.getNewPassword())){
+            return -1;
+        }
+        QueryWrapper<Admin> wrapper = new QueryWrapper<>();
+        wrapper.lambda().eq(Admin::getUsername,param.getUsername());
+        List<Admin> adminList = list(wrapper);
+        if(CollUtil.isEmpty(adminList)){
+            return -2;
+        }
+        Admin umsAdmin = adminList.get(0);
+        if(!passwordEncoder.matches(param.getOldPassword(),umsAdmin.getPassword())){
+            return -3;
+        }
+        umsAdmin.setPassword(passwordEncoder.encode(param.getNewPassword()));
+        updateById(umsAdmin);
+        return 1;
+    }
+
+    @Override
+    public Admin getAdminByUsername(String username) {
+        QueryWrapper<Admin>wrapper =new QueryWrapper<>();
+        wrapper.lambda().eq(Admin::getUsername,username);
+        Admin admin;
+        List<Admin> adminList = list(wrapper);
+        if (adminList != null && adminList.size() > 0) {
+            admin = adminList.get(0);
+            return admin;
+        }
+        return null;
     }
 
 

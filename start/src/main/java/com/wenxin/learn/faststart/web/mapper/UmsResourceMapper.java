@@ -11,9 +11,6 @@ import java.util.List;
  * <p>
  * 后台资源表 Mapper 接口
  * </p>
- *
- * @author macro
- * @since 2020-08-21
  */
 @Mapper
 public interface UmsResourceMapper extends BaseMapper<UmsResource> {

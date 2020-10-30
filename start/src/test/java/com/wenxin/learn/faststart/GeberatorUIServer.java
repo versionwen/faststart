@@ -13,7 +13,7 @@ public class GeberatorUIServer {
     public static void main(String[] args) {
         GeneratorConfig config = GeneratorConfig.builder().jdbcUrl("jdbc:mysql://124.70.20.81:3306/edu?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai")
                 .userName("root")
-                .password("password")
+                .password("123456wenxinxin")
                 .driverClassName("com.mysql.cj.jdbc.Driver")
                 //数据库schema，POSTGRE_SQL,ORACLE,DB2类型的数据库需要指定
                 .schemaName("myBusiness")

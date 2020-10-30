@@ -1,10 +1,13 @@
 package com.wenxin.learn.faststart.web.controller;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
 import com.wenxin.learn.faststart.web.api.CommonResult;;
+import com.wenxin.learn.faststart.web.entity.Role;
 import com.wenxin.learn.faststart.web.entity.admin.AdminPO;
 import com.wenxin.learn.faststart.web.entity.user.LoginUser;
+import com.wenxin.learn.faststart.web.service.RoleService;
 import com.wenxin.learn.faststart.web.utils.RedisUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,8 +24,11 @@ import com.wenxin.learn.faststart.web.entity.Admin;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -35,11 +41,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin")
 @Slf4j
-@Api(tags = "AdminController",value = "后台用户管理")
+@Api(tags = "后台用户管理")
 public class AdminAction {
     @Autowired
     private RedisUtils redisUtils;
-
+    @Autowired
+    private RoleService roleService;
     @Autowired
     private AdminService adminService;
     @Value("${jwt.tokenHead}")
@@ -216,5 +223,25 @@ public class AdminAction {
         tokenResult.put("token",refreshToken);
         tokenResult.put("tokenHead",tokenHead);
         return CommonResult.success(tokenResult);
+    }
+    @ApiOperation(value = "获取当前登录用户信息")
+    @GetMapping(value = "/info")
+    public CommonResult getAdminInfo(Principal principal) {
+        if(principal==null){
+            return CommonResult.unauthorized(null);
+        }
+        String username = principal.getName();
+        Admin umsAdmin = adminService.getAdminByUsername(username);
+        Map<String, Object> data = new HashMap<>();
+        data.put("userid",umsAdmin.getId());
+        data.put("username", umsAdmin.getUsername());
+        data.put("menus", roleService.getMenuList(umsAdmin.getId()));
+        data.put("icon", umsAdmin.getIcon());
+        List<Role> roleList = adminService.getRoleList(umsAdmin.getId());
+        if(CollUtil.isNotEmpty(roleList)){
+            List<String> roles = roleList.stream().map(Role::getName).collect(Collectors.toList());
+            data.put("roles",roles);
+        }
+        return CommonResult.success(data);
     }
 }
